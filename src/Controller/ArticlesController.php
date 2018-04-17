@@ -2,6 +2,7 @@
 // src/Controller/ArticlesController.php
 
 namespace App\Controller;
+use Cake\ORM\Query;
 
 class ArticlesController extends AppController
 {
@@ -35,6 +36,11 @@ class ArticlesController extends AppController
             }
             $this->Flash->error(__('Impossible d\'ajouter votre article.'));
         }
+        // Récupère une liste des tags.
+        $tags = $this->Articles->Tags->find('list');
+
+        // Passe les tags au context de la view
+        $this->set('tags', $tags);
         $this->set('article', $article);
     }   
 
@@ -50,7 +56,29 @@ class ArticlesController extends AppController
         }
         $this->Flash->error(__('Impossible de mettre à jour l\'article.'));
       }
+      // Récupère une liste des tags.
+      $tags = $this->Articles->Tags->find('list');
+      // Passe les tags au context de la view
+     $this->set('tags', $tags);
+     $this->set('article', $article);
+     
+   }
 
-      $this->set('article', $article);
+   public function tags()
+   {
+     // La clé 'pass' est fournie par CakePHP et contient tous les
+     // segments d'URL passés dans la requête
+     $tags = $this->request->getParam('pass');
+
+     // Utilisation de ArticlesTable pour trouver les articles taggés
+     $articles = $this->Articles->find('tagged', [
+        'tags' => $tags
+     ]);
+
+     // Passage des variable dans le contexte de la view du template
+     $this->set([
+        'articles' => $articles,
+        'tags' => $tags
+     ]);
    }
 }
